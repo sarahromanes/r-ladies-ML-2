@@ -1,0 +1,111 @@
+---
+title: "Cross Validation - Exercises"
+author: "Sarah Romanes"
+date: "13 October 2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Set Up
+
+```{r Loading Packages}
+library(cvTools) 
+library(caret)
+
+
+# ML methods
+library(class)
+library(rpart)
+library(randomForest)
+```
+
+
+```{r Setting up the Data}
+data <- read.csv("data/diabetes.csv")
+```
+
+```{r Explore the data}
+head(data)
+str(data)
+
+
+X <- data[,-9]
+y <- as.factor(data$class)
+```
+
+```{r Setting up CV parameters}
+n <- nrow(X)
+V=5
+```
+
+
+# CV Loop - KNN
+
+```{r}
+cvSets <- cvFolds(n,V)
+
+error.fold <- c()
+
+for(j in 1:V){
+  inds <- which(cvSets$which==j)
+      
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  fit <- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j]=sum(fit!=y.test)
+}
+
+cv.error <- sum(test.error.knn)/n
+cv.error
+
+```
+
+```{r}
+V <- 200
+n <- nrow(data)
+reps <- 10
+
+X <- data[,1:8]
+y <- data$class
+
+cv.error <- c()
+for(i in 1:reps){
+  
+  set.seed(i)
+  
+  cvSets <- cvFolds(n,V)
+  
+  error.fold <- c()
+  for(j in 1:V){
+    
+    inds <- which(cvSets$which==j)
+        
+    test.inds <- cvSets$subsets[inds]
+    
+    X.test <- X[test.inds,]
+    X.train <- X[-test.inds,]
+    y.test <- y[test.inds]
+    y.train <- y[-test.inds]
+    
+    fit <- knn(X.train, X.test, y.train, k=9)
+    
+    error.fold[j] <- sum(fit!=y.test)
+  }
+  
+  cv.error[i] <- sum(error.fold)/n
+  
+}
+
+cv.100<- cv.error
+
+boxplot(cv.5, cv.20, cv.100)
+
+```
+

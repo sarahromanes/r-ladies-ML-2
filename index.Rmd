@@ -1,0 +1,1016 @@
+---
+title: "Machine Learning 101"
+subtitle: "Model Assessment in R"
+author: "<br><br>Sarah Romanes&nbsp;&nbsp;&nbsp;`r anicon::faa('twitter', animate='float', rtext='&nbsp;@sarah_romanes')`"
+date: "<br>17-Oct-2018<br><br>`r anicon::faa('link', animate='vertical', rtext='&nbsp;bit.ly/rladies-sydney-ML-2', color='white')`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["kunoichi", "ninjutsu", "assets/custom.css"]
+    seal: true 
+    self_contained: false
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+livedemosign <- function(top, left, deg) {
+  htmltools::div("Live Demo!", class="faa-flash animated",
+                 style=glue::glue("border:solid; border-color:black; position:absolute; top:{top}%; left:{left}%; font-size:36px; padding:4px; background-color:white; color:black;transform:rotate({deg}deg);")
+                 )
+}
+
+```
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Welcome!]
+]
+]]
+
+---
+
+class: split-two white
+
+.column.bg-main1[.content.vmiddle.center[
+
+# Overview
+
+<br>
+
+### This two part R-Ladies workshop is designed to give you a small taster into the large field that is known as .orange[**Machine Learning**]! Last week, we covered supervised learning techniques, and this week we will cover model assessment. 
+
+<br>
+
+### You can always visit last weeks slides at .orange[bit.ly/r-ladies-ML-1] with the corresponding `r icon::fa("github", size=1)` repo [here](https://github.com/sarahromanes/r-ladies-ML-1).
+
+]]
+.column.bg-main3[.content.vmiddle.center[
+<img src="images/machinewar.png", width="70%">
+
+##### [SMBC](https://www.smbc-comics.com/comic/rise-of-the-machines)
+
+
+]]
+
+---
+
+# .purple[Recap - What *is* Machine Learning?]
+
+<br>
+
+### Machine learning is concerned with finding functions $Y=f(X)+\epsilon$ that best **predict** outputs (responses), given data inputs (predictors).
+
+<br>
+
+<center>
+
+  <img src="images/ml-process.png", width="50%">
+
+</center>
+
+<br>
+
+### Mathematically, Machine Learning problems are simply *optimisation* problems, in which we will use .purple[`r icon::fa("r-project", size=1)`] to help us solve!
+
+
+---
+
+# Example of Methods Covered
+
+---
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Performance Metrics]
+]
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+<br>
+
+# Regression - revisited 
+
+### Recall the simulated dataset `Income`, which looked at the relationship between `Education` (years) and `Income` (thousands).
+
+```{r}
+data <- read.csv("data/Income.csv")
+head(data)
+```
+
+### How can we assess how well our line fits the data?
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+```{r, fig.retina=4, echo=FALSE}
+p <- ggplot(data, aes(x=Education, y=Income))+geom_point(size=3, color="red")  + theme(text = element_text(size=20)) 
+p
+```
+
+
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+<br>
+
+# Is a straight line the best fit?
+
+<br>
+
+## Last week we considered fitting a .orange[Linear] fit to this data, resulting in the following... (see here for fitting procedure)
+
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+```{r, fig.retina=4, echo=FALSE}
+p <- ggplot(data, aes(x=Education, y=Income))+geom_point(size=3, color="red")  + theme(text = element_text(size=20)) 
+p + stat_smooth(method = "lm", se=FALSE)
+```
+
+
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+<br>
+
+# Is a straight line the best fit?
+
+<br>
+
+## Last week we considered fitting a .orange[Linear] fit to this data, resulting in the following... (see here for fitting procedure)
+
+## However there are many types of curves we could have fit to this dataset!
+]]
+
+.column[.content.vmiddle.center[
+
+<img src="images/curves.jpg", width="60%">
+
+]]
+
+
+---
+class: split-two white 
+
+.column.bg-main1[.content[
+<br>
+
+# Is a straight line the best fit?
+
+### Last week we considered fitting a .orange[Linear] fit to this data, resulting in the follows
+
+```{r}
+data <- read.csv("data/Income.csv")
+head(data)
+```
+
+### How can we assess how well our line fits the data?
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+```{r, fig.retina=4, echo=FALSE}
+p <- ggplot(data, aes(x=Education, y=Income))+geom_point(size=3, color="red")  + theme(text = element_text(size=20)) 
+p+ stat_smooth(aes(x = Education, y = Income), method = "lm",
+              formula = y ~ poly(x, 17), se = FALSE) 
+```
+
+
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+<br>
+
+# Is a straight line the best fit?
+
+### Last week we considered fitting a .orange[Linear] fit to this data, resulting in the follows
+
+```{r}
+data <- read.csv("data/Income.csv")
+head(data)
+```
+
+### How can we assess how well our line fits the data?
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+```{r, fig.retina=4, echo=FALSE}
+p <- ggplot(data, aes(x=Education, y=Income))+geom_point(size=3, color="red")  + theme(text = element_text(size=20)) 
+p + stat_smooth(method="loess", se=FALSE)
+```
+
+
+]]
+
+
+
+---
+
+# RMSE
+
+
+---
+
+class: middle center bg-main1
+
+# Having a super accurate model is good, right?
+
+<img src="images/bird.jpg", width="70%">
+
+---
+
+class: middle center bg-main1
+
+# We don't want a model that is too constrained either!
+
+<img src="images/constraints.png", width="70%">
+
+---
+
+# .purple[The Bias-Variance Tradeoff]
+
+<br>
+
+### Machine learning is concerned with finding functions $Y=f(X)+\epsilon$ that best **predict** outputs (responses), given data inputs (predictors).
+
+<br>
+
+<center>
+
+  <img src="images/tradeoff.png", width="50%">
+
+</center>
+
+<br>
+
+### Mathematically, Machine Learning problems are simply *optimisation* problems, in which we will use .purple[`r icon::fa("r-project", size=1)`] to help us solve!
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+
+<br>
+
+# GLMs revisited
+
+<br>
+
+### Recall the dataset `Exam`, where two exam scores are given for each student, and a Label represents whether they passed or failed the course.
+
+```{r, fig.retina=4}
+data<- read.csv("data/Exam.csv", header=T)
+head(data,4)
+```
+
+]]
+
+.column[.content.vmiddle.center[
+```{r, fig.retina=4, echo=FALSE}
+ggplot(data, aes(x=Exam1, y=Exam2, color=factor(Label)))+geom_point(size=4) + theme(text = element_text(size=20))
+```
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# We can fit the glm in `r icon::fa("r-project", size=1)` using the `glm` function as follows:
+
+<br>
+
+```{r, eval=F}
+fit <-  glm(data=data, #<<
+            Label ~ ., #<<
+            family=binomial(link="logit"))  #<<
+summary(fit)
+```
+```{r, eval=F}
+Call:
+glm(formula = Label ~ ., family = binomial(link = "logit"), 
+    data = data)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-2.19287  -0.18009   0.01577   0.19578   1.78527  
+
+Coefficients:
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -25.16133    5.79836  -4.339 1.43e-05 ***
+Exam1         0.20623    0.04800   4.297 1.73e-05 ***
+Exam2         0.20147    0.04862   4.144 3.42e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# We fit a `glm` against all predictors like we did last week.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# We can fit the glm in `r icon::fa("r-project", size=1)` using the `glm` function as follows:
+
+<br>
+
+```{r, eval=F}
+fit <-  glm(data=data, #<<
+            Label ~ ., #<<
+            family=binomial(link="logit"))  #<<
+```
+```{r, eval=F}
+fitted.vals <- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
+                             type="response"))
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# We can find the .orange[*Resubstitution Error Rate*] by predicting the values of all our data points using our fitted model.
+]]
+
+---
+
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# Confusion table
+
+<br>
+
+```{r, eval=F}
+fit <-  glm(data=data, #<<
+            Label ~ ., #<<
+            family=binomial(link="logit"))  
+```
+```{r, eval=F}
+fitted.vals <- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
+                             type="response"))
+
+library(caret)
+C.matrix <- confusionMatrix(as.factor(data$Label), as.factor(fitted.vals)) #<<
+c.matrix$table
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+## We can examine how our model predicted all the data points, using `confusionMatrix` from the `caret` package. Note, that we are required to put in factor inputs.
+]]
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# Confusion table
+
+<br>
+
+```{r, eval=F}
+fit <-  glm(data=data, #<<
+            Label ~ ., #<<
+            family=binomial(link="logit"))  
+fitted.vals <- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
+                             type="response"))
+
+library(caret)
+C.matrix <- confusionMatrix(as.factor(fitted.vals), 
+                            as.factor(data$Label)) 
+c.matrix$table #<<
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+## Looking at the `table` output, reading *vertically*, we can assess model performance. Out of the 40 failures in our dataset, GLM sucessfully predicts 34. Out of the 60 passes in oue data, GLM sucessfully predicts 55.
+]]
+
+
+---
+
+class: middle center bg-main1
+
+# Your turn!
+
+## `r anicon::faa('sync-alt', animate='spin', size=4)`
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# Classifying and assessing model fit for Pima Indians Diabetes
+
+<br>
+
+```{r}
+data <- read.csv("data/diabetes.csv")
+dim(data)
+```
+```{r, eval=F}
+str(data)
+'data.frame':	768 obs. of  9 variables:
+ $ pregnant : int  6 1 8 1 0 5 3 10 2 8 ...
+ $ glucose  : int  148 85 183 89 137 116 78 115 197 125 ...
+ $ hg       : int  72 66 64 66 40 74 50 0 70 96 ...
+ $ thickness: int  35 29 0 23 35 0 32 0 45 0 ...
+ $ insulin  : int  0 0 0 94 168 0 88 0 543 0 ...
+ $ bmi      : num  33.6 26.6 23.3 28.1 43.1 25.6 31 35.3 30.5 0 ...
+ $ pedigree : num  0.627 0.351 0.672 0.167 2.288 ...
+ $ age      : int  50 31 32 21 33 30 26 29 53 54 ...
+ $ class    : int  1 0 1 0 1 0 1 0 1 1 ... #<<
+
+data$class <- as.factor(data$class)
+```
+
+
+
+]]
+
+
+.column.bg-main3[.content.vmiddle.center[
+# Assess the performance of a classification method of .orange[*your choice*] on classifying `class`.
+]]
+
+---
+
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Cross Validation]
+]
+]]
+
+---
+
+# What to do with all the metrics?
+
+---
+
+# Training and test set
+
+Often, we want to see how well our model can predict new data points. However, it is often impossible to get completely new data. So, we split our data into *training* and *testing* sets to evaluate performance, treating the *testing* data as new data points.
+
+---
+
+# .purple[How many folds?]
+
+<br>
+
+<center>
+
+  <img src="images/splits.png", width="75%">
+
+</center>
+
+<br>
+
+
+
+---
+
+# Bias Variance Trade off - Revisited
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV in R using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+str(cvSets)
+List of 5
+ $ n      : num 768 
+ $ K      : num 5
+ $ R      : num 1
+ $ subsets: int [1:768, 1] 110 386 469 511 39 485 741 563 572 759 ... #<<
+ $ which  : int [1:768] 1 2 3 4 5 1 2 3 4 5 ... #<<
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+
+set.seed(1) #<<
+
+for(j in 1:V){
+  
+  inds <- which(cvSets$which==j)
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  fit <- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] <- sum(fit!=y.test)
+}
+
+cv.error <- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+
+set.seed(1)
+
+for(j in 1:V){ #<<
+  
+  inds <- which(cvSets$which==j)
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  fit <- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] <- sum(fit!=y.test)
+}
+
+cv.error <- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds <- which(cvSets$which==j) #<<
+  test.inds <- cvSets$subsets[inds] #<<
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  fit <- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] <- sum(fit!=y.test)
+}
+
+cv.error <- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds <- which(cvSets$which==j)
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,] #<<
+  X.train <- X[-test.inds,] #<<
+  y.test <- y[test.inds] #<<
+  y.train <- y[-test.inds] #<<
+  
+  fit <- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] <- sum(fit!=y.test)
+}
+
+cv.error <- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds <- which(cvSets$which==j)
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  fit <- knn(X.train, X.test, y.train, k=4) #<<
+  
+  error.fold[j] <- sum(fit!=y.test)
+}
+
+cv.error <- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds <- which(cvSets$which==j)
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  fit <- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] <- sum(fit!=y.test) #<<
+}
+
+cv.error <- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+<br>
+
+```{r, echo=F, eval=F}
+library(cvTools)
+V <- 5
+cvSets <- cvFolds(n,V)
+```
+
+
+```{r, eval=F}
+
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds <- which(cvSets$which==j)
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  fit <- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] <- sum(fit!=y.test)
+}
+
+cv.error <- sum(error.fold)/n #<<
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: middle center bg-main1
+
+# Your turn!
+
+## `r anicon::faa('sync-alt', animate='spin', size=4)`
+
+
+---
+
+# Dettermine best value of K.
+# Repeat exercise but for RandomForest instead of KNN. Which performs better?
+
+
+---
+
+# .purple[Repeated K fold CV]
+
+<br>
+
+<center>
+
+  <img src="images/repeat1.png", width="90%">
+
+</center>
+
+<br>
+
+---
+
+# .purple[Repeated K fold CV]
+
+<br>
+
+<center>
+
+  <img src="images/repeat2.png", width="90%">
+
+</center>
+
+<br>
+
+
+---
+# .purple[Repeated K fold CV]
+
+<br>
+
+<center>
+
+  <img src="images/repeat3.png", width="90%">
+
+</center>
+
+<br>
+
+
+
+---
+
+# Example pima indians KNN
+
+```{r, eval=F}
+cv.error <- c()
+for(i in 1:reps){
+  
+  set.seed(i)
+  
+  cvSets <- cvFolds(n,V)
+  
+  error.fold <- c()
+  for(j in 1:V){
+    
+    inds <- which(cvSets$which==j)
+        
+    test.inds <- cvSets$subsets[inds]
+    
+    X.test <- X[test.inds,]
+    X.train <- X[-test.inds,]
+    y.test <- y[test.inds]
+    y.train <- y[-test.inds]
+    
+    fit <- knn(X.train, X.test, y.train, k=9)
+    
+    error.fold[j] <- sum(fit!=y.test)
+  }
+  
+  cv.error[i] <- sum(error.fold)/n
+  
+}
+```
+
+---
+
+class: middle center bg-main1
+
+# Your turn!
+
+## `r anicon::faa('sync-alt', animate='spin', size=4)`
+
+---
+
+# Repeat for RandomForest, and plot the results
+
+---
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Easy CV with `caret`]
+]
+]]
+
+
+---
+
+# We can repeat the CV process for KNN in a much easier way using the caret package.
+
+```{r, eval=F}
+fitControl <- trainControl(## 5-fold CV
+                           method = "repeatedcv",
+                           number =5,
+                           ## repeated ten times
+                           repeats = 10)
+
+set.seed(825)
+knnFit1 <- train(class ~ ., data = data, 
+                 method = "knn", 
+                 trControl = fitControl)
+knnFit1
+
+```
+
+---
+
+# But why so much work?
+
+- Not all methods are covered by caret
+- Much easier to understand how CV works by building it yourslef.
+
+---
+
+
+
+
+
+---

@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Machine Learning 101</title>
+    <meta charset="utf-8">
+    <meta name="author" content="  Sarah Romanes   <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;&amp;nbsp;@sarah_romanes</span>" />
+    <link href="libs/remark-css/kunoichi.css" rel="stylesheet" />
+    <link href="libs/remark-css/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome/js/fontawesome-all.min.js"></script>
+    <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets\custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Machine Learning 101
+## Model Assessment in R
+### <br><br>Sarah Romanes   <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;&amp;nbsp;@sarah_romanes</span>
+### <br>17-Oct-2018<br><br><span>&lt;i class="fas  fa-link faa-vertical animated " style=" color:white;"&gt;&lt;/i&gt;&amp;nbsp;bit.ly/rladies-sydney-ML-2</span>
+
+---
+
+
+
+
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Welcome!]
+]
+]]
+
+---
+
+class: split-two white
+
+.column.bg-main1[.content.vmiddle.center[
+
+# Overview
+
+&lt;br&gt;
+
+### This two part R-Ladies workshop is designed to give you a small taster into the large field that is known as .orange[**Machine Learning**]! Last week, we covered supervised learning techniques, and this week we will cover model assessment. 
+
+&lt;br&gt;
+
+### You can always visit last weeks slides at .orange[bit.ly/r-ladies-ML-1] with the corresponding <i class="fab  fa-github "></i> repo [here](https://github.com/sarahromanes/r-ladies-ML-1).
+
+]]
+.column.bg-main3[.content.vmiddle.center[
+&lt;img src="images/machinewar.png", width="70%"&gt;
+
+##### [SMBC](https://www.smbc-comics.com/comic/rise-of-the-machines)
+
+
+]]
+
+---
+
+# .purple[Recap - What *is* Machine Learning?]
+
+&lt;br&gt;
+
+### Machine learning is concerned with finding functions `\(Y=f(X)+\epsilon\)` that best **predict** outputs (responses), given data inputs (predictors).
+
+&lt;br&gt;
+
+&lt;center&gt;
+
+  &lt;img src="images/ml-process.png", width="50%"&gt;
+
+&lt;/center&gt;
+
+&lt;br&gt;
+
+### Mathematically, Machine Learning problems are simply *optimisation* problems, in which we will use .purple[<i class="fab  fa-r-project "></i>] to help us solve!
+
+
+---
+
+# Example of Methods Covered
+
+---
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Performance Metrics]
+]
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Regression - revisited 
+
+### Recall the simulated dataset `Income`, which looked at the relationship between `Education` (years) and `Income` (thousands).
+
+
+```r
+data &lt;- read.csv("data/Income.csv")
+head(data)
+```
+
+```
+##   Education   Income
+## 1  10.00000 26.65884
+## 2  10.40134 27.30644
+## 3  10.84281 22.13241
+## 4  11.24415 21.16984
+## 5  11.64548 15.19263
+## 6  12.08696 26.39895
+```
+
+### How can we assess how well our line fits the data?
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-2-1.png" width="504" /&gt;
+
+
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Is a straight line the best fit?
+
+&lt;br&gt;
+
+## Last week we considered fitting a .orange[Linear] fit to this data, resulting in the following... (see here for fitting procedure)
+
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-3-1.png" width="504" /&gt;
+
+
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Is a straight line the best fit?
+
+&lt;br&gt;
+
+## Last week we considered fitting a .orange[Linear] fit to this data, resulting in the following... (see here for fitting procedure)
+
+## However there are many types of curves we could have fit to this dataset!
+]]
+
+.column[.content.vmiddle.center[
+
+&lt;img src="images/curves.jpg", width="60%"&gt;
+
+]]
+
+
+---
+class: split-two white 
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Is a straight line the best fit?
+
+### Last week we considered fitting a .orange[Linear] fit to this data, resulting in the follows
+
+
+```r
+data &lt;- read.csv("data/Income.csv")
+head(data)
+```
+
+```
+##   Education   Income
+## 1  10.00000 26.65884
+## 2  10.40134 27.30644
+## 3  10.84281 22.13241
+## 4  11.24415 21.16984
+## 5  11.64548 15.19263
+## 6  12.08696 26.39895
+```
+
+### How can we assess how well our line fits the data?
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-5-1.png" width="504" /&gt;
+
+
+]]
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Is a straight line the best fit?
+
+### Last week we considered fitting a .orange[Linear] fit to this data, resulting in the follows
+
+
+```r
+data &lt;- read.csv("data/Income.csv")
+head(data)
+```
+
+```
+##   Education   Income
+## 1  10.00000 26.65884
+## 2  10.40134 27.30644
+## 3  10.84281 22.13241
+## 4  11.24415 21.16984
+## 5  11.64548 15.19263
+## 6  12.08696 26.39895
+```
+
+### How can we assess how well our line fits the data?
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" width="504" /&gt;
+
+
+]]
+
+
+
+---
+
+# RMSE
+
+
+---
+
+class: middle center bg-main1
+
+# Having a super accurate model is good, right?
+
+&lt;img src="images/bird.jpg", width="70%"&gt;
+
+---
+
+class: middle center bg-main1
+
+# We don't want a model that is too constrained either!
+
+&lt;img src="images/constraints.png", width="70%"&gt;
+
+---
+
+# .purple[The Bias-Variance Tradeoff]
+
+&lt;br&gt;
+
+### Machine learning is concerned with finding functions `\(Y=f(X)+\epsilon\)` that best **predict** outputs (responses), given data inputs (predictors).
+
+&lt;br&gt;
+
+&lt;center&gt;
+
+  &lt;img src="images/tradeoff.png", width="50%"&gt;
+
+&lt;/center&gt;
+
+&lt;br&gt;
+
+### Mathematically, Machine Learning problems are simply *optimisation* problems, in which we will use .purple[<i class="fab  fa-r-project "></i>] to help us solve!
+
+---
+
+class: split-two white 
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# GLMs revisited
+
+&lt;br&gt;
+
+### Recall the dataset `Exam`, where two exam scores are given for each student, and a Label represents whether they passed or failed the course.
+
+
+```r
+data&lt;- read.csv("data/Exam.csv", header=T)
+head(data,4)
+```
+
+```
+##      Exam1    Exam2 Label
+## 1 34.62366 78.02469     0
+## 2 30.28671 43.89500     0
+## 3 35.84741 72.90220     0
+## 4 60.18260 86.30855     1
+```
+
+]]
+
+.column[.content.vmiddle.center[
+&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="504" /&gt;
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# We can fit the glm in <i class="fab  fa-r-project "></i> using the `glm` function as follows:
+
+&lt;br&gt;
+
+
+```r
+*fit &lt;-  glm(data=data,
+*           Label ~ .,
+*           family=binomial(link="logit"))
+summary(fit)
+```
+
+```r
+Call:
+glm(formula = Label ~ ., family = binomial(link = "logit"), 
+    data = data)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-2.19287  -0.18009   0.01577   0.19578   1.78527  
+
+Coefficients:
+             Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -25.16133    5.79836  -4.339 1.43e-05 ***
+Exam1         0.20623    0.04800   4.297 1.73e-05 ***
+Exam2         0.20147    0.04862   4.144 3.42e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# We fit a `glm` against all predictors like we did last week.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# We can fit the glm in <i class="fab  fa-r-project "></i> using the `glm` function as follows:
+
+&lt;br&gt;
+
+
+```r
+*fit &lt;-  glm(data=data,
+*           Label ~ .,
+*           family=binomial(link="logit"))
+```
+
+```r
+fitted.vals &lt;- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
+                             type="response"))
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# We can find the .orange[*Resubstitution Error Rate*] by predicting the values of all our data points using our fitted model.
+]]
+
+---
+
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# Confusion table
+
+&lt;br&gt;
+
+
+```r
+*fit &lt;-  glm(data=data,
+*           Label ~ .,
+            family=binomial(link="logit"))  
+```
+
+```r
+fitted.vals &lt;- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
+                             type="response"))
+
+library(caret)
+*C.matrix &lt;- confusionMatrix(as.factor(data$Label), as.factor(fitted.vals))
+c.matrix$table
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+## We can examine how our model predicted all the data points, using `confusionMatrix` from the `caret` package. Note, that we are required to put in factor inputs.
+]]
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# Confusion table
+
+&lt;br&gt;
+
+
+```r
+*fit &lt;-  glm(data=data,
+*           Label ~ .,
+            family=binomial(link="logit"))  
+fitted.vals &lt;- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
+                             type="response"))
+
+library(caret)
+C.matrix &lt;- confusionMatrix(as.factor(fitted.vals), 
+                            as.factor(data$Label)) 
+*c.matrix$table
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+## Looking at the `table` output, reading *vertically*, we can assess model performance. Out of the 40 failures in our dataset, GLM sucessfully predicts 34. Out of the 60 passes in oue data, GLM sucessfully predicts 55.
+]]
+
+
+---
+
+class: middle center bg-main1
+
+# Your turn!
+
+## <span>&lt;i class="fas  fa-sync-alt fa-4x faa-spin animated "&gt;&lt;/i&gt;</span>
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# Classifying and assessing model fit for Pima Indians Diabetes
+
+&lt;br&gt;
+
+
+```r
+data &lt;- read.csv("data/diabetes.csv")
+dim(data)
+```
+
+```
+## [1] 768   9
+```
+
+```r
+str(data)
+'data.frame':	768 obs. of  9 variables:
+ $ pregnant : int  6 1 8 1 0 5 3 10 2 8 ...
+ $ glucose  : int  148 85 183 89 137 116 78 115 197 125 ...
+ $ hg       : int  72 66 64 66 40 74 50 0 70 96 ...
+ $ thickness: int  35 29 0 23 35 0 32 0 45 0 ...
+ $ insulin  : int  0 0 0 94 168 0 88 0 543 0 ...
+ $ bmi      : num  33.6 26.6 23.3 28.1 43.1 25.6 31 35.3 30.5 0 ...
+ $ pedigree : num  0.627 0.351 0.672 0.167 2.288 ...
+ $ age      : int  50 31 32 21 33 30 26 29 53 54 ...
+*$ class    : int  1 0 1 0 1 0 1 0 1 1 ...
+
+data$class &lt;- as.factor(data$class)
+```
+
+
+
+]]
+
+
+.column.bg-main3[.content.vmiddle.center[
+# Assess the performance of a classification method of .orange[*your choice*] on classifying `class`.
+]]
+
+---
+
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Cross Validation]
+]
+]]
+
+---
+
+# What to do with all the metrics?
+
+---
+
+# Training and test set
+
+Often, we want to see how well our model can predict new data points. However, it is often impossible to get completely new data. So, we split our data into *training* and *testing* sets to evaluate performance, treating the *testing* data as new data points.
+
+---
+
+# .purple[How many folds?]
+
+&lt;br&gt;
+
+&lt;center&gt;
+
+  &lt;img src="images/splits.png", width="75%"&gt;
+
+&lt;/center&gt;
+
+&lt;br&gt;
+
+
+
+---
+
+# Bias Variance Trade off - Revisited
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV in R using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+str(cvSets)
+List of 5
+ $ n      : num 768 
+ $ K      : num 5
+ $ R      : num 1
+*$ subsets: int [1:768, 1] 110 386 469 511 39 485 741 563 572 759 ...
+*$ which  : int [1:768] 1 2 3 4 5 1 2 3 4 5 ...
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+*set.seed(1)
+
+for(j in 1:V){
+  
+  inds &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[inds]
+  
+  X.test &lt;- X[test.inds,]
+  X.train &lt;- X[-test.inds,]
+  y.test &lt;- y[test.inds]
+  y.train &lt;- y[-test.inds]
+  
+  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] &lt;- sum(fit!=y.test)
+}
+
+cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+set.seed(1)
+
+*for(j in 1:V){
+  
+  inds &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[inds]
+  
+  X.test &lt;- X[test.inds,]
+  X.train &lt;- X[-test.inds,]
+  y.test &lt;- y[test.inds]
+  y.train &lt;- y[-test.inds]
+  
+  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] &lt;- sum(fit!=y.test)
+}
+
+cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+set.seed(1)
+
+for(j in 1:V){
+  
+* inds &lt;- which(cvSets$which==j)
+* test.inds &lt;- cvSets$subsets[inds]
+  
+  X.test &lt;- X[test.inds,]
+  X.train &lt;- X[-test.inds,]
+  y.test &lt;- y[test.inds]
+  y.train &lt;- y[-test.inds]
+  
+  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] &lt;- sum(fit!=y.test)
+}
+
+cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[inds]
+  
+* X.test &lt;- X[test.inds,]
+* X.train &lt;- X[-test.inds,]
+* y.test &lt;- y[test.inds]
+* y.train &lt;- y[-test.inds]
+  
+  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] &lt;- sum(fit!=y.test)
+}
+
+cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[inds]
+  
+  X.test &lt;- X[test.inds,]
+  X.train &lt;- X[-test.inds,]
+  y.test &lt;- y[test.inds]
+  y.train &lt;- y[-test.inds]
+  
+* fit &lt;- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] &lt;- sum(fit!=y.test)
+}
+
+cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[inds]
+  
+  X.test &lt;- X[test.inds,]
+  X.train &lt;- X[-test.inds,]
+  y.test &lt;- y[test.inds]
+  y.train &lt;- y[-test.inds]
+  
+  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  
+* error.fold[j] &lt;- sum(fit!=y.test)
+}
+
+cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+
+
+
+
+```r
+set.seed(1)
+
+for(j in 1:V){
+  
+  inds &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[inds]
+  
+  X.test &lt;- X[test.inds,]
+  X.train &lt;- X[-test.inds,]
+  y.test &lt;- y[test.inds]
+  y.train &lt;- y[-test.inds]
+  
+  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  
+  error.fold[j] &lt;- sum(fit!=y.test)
+}
+
+*cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# This tells the `lm` function what data we are referring to.
+]]
+
+---
+
+class: middle center bg-main1
+
+# Your turn!
+
+## <span>&lt;i class="fas  fa-sync-alt fa-4x faa-spin animated "&gt;&lt;/i&gt;</span>
+
+
+---
+
+# Dettermine best value of K.
+# Repeat exercise but for RandomForest instead of KNN. Which performs better?
+
+
+---
+
+# .purple[Repeated K fold CV]
+
+&lt;br&gt;
+
+&lt;center&gt;
+
+  &lt;img src="images/repeat1.png", width="90%"&gt;
+
+&lt;/center&gt;
+
+&lt;br&gt;
+
+---
+
+# .purple[Repeated K fold CV]
+
+&lt;br&gt;
+
+&lt;center&gt;
+
+  &lt;img src="images/repeat2.png", width="90%"&gt;
+
+&lt;/center&gt;
+
+&lt;br&gt;
+
+
+---
+# .purple[Repeated K fold CV]
+
+&lt;br&gt;
+
+&lt;center&gt;
+
+  &lt;img src="images/repeat3.png", width="90%"&gt;
+
+&lt;/center&gt;
+
+&lt;br&gt;
+
+
+
+---
+
+# Example pima indians KNN
+
+
+```r
+cv.error &lt;- c()
+for(i in 1:reps){
+  
+  set.seed(i)
+  
+  cvSets &lt;- cvFolds(n,V)
+  
+  error.fold &lt;- c()
+  for(j in 1:V){
+    
+    inds &lt;- which(cvSets$which==j)
+        
+    test.inds &lt;- cvSets$subsets[inds]
+    
+    X.test &lt;- X[test.inds,]
+    X.train &lt;- X[-test.inds,]
+    y.test &lt;- y[test.inds]
+    y.train &lt;- y[-test.inds]
+    
+    fit &lt;- knn(X.train, X.test, y.train, k=9)
+    
+    error.fold[j] &lt;- sum(fit!=y.test)
+  }
+  
+  cv.error[i] &lt;- sum(error.fold)/n
+  
+}
+```
+
+---
+
+class: middle center bg-main1
+
+# Your turn!
+
+## <span>&lt;i class="fas  fa-sync-alt fa-4x faa-spin animated "&gt;&lt;/i&gt;</span>
+
+---
+
+# Repeat for RandomForest, and plot the results
+
+---
+
+layout: false
+class: bg-main3 split-30 hide-slide-number
+
+.column[
+
+]
+.column.slide-in-right[.content.vmiddle[
+.sliderbox.shade_main.pad1[
+.font5[Easy CV with `caret`]
+]
+]]
+
+
+---
+
+# We can repeat the CV process for KNN in a much easier way using the caret package.
+
+
+```r
+fitControl &lt;- trainControl(## 5-fold CV
+                           method = "repeatedcv",
+                           number =5,
+                           ## repeated ten times
+                           repeats = 10)
+
+set.seed(825)
+knnFit1 &lt;- train(class ~ ., data = data, 
+                 method = "knn", 
+                 trControl = fitControl)
+knnFit1
+```
+
+---
+
+# But why so much work?
+
+- Not all methods are covered by caret
+- Much easier to understand how CV works by building it yourslef.
+
+---
+
+
+
+
+
+---
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

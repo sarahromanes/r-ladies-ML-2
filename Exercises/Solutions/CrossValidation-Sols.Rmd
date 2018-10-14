@@ -1,0 +1,70 @@
+---
+title: "Cross Validation - Solutions"
+author: "Sarah Romanes"
+date: "13 October 2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Set Up
+
+```{r Loading Packages}
+library(cvTools) 
+library(caret)
+
+
+# ML methods
+library(class)
+library(rpart)
+library(randomForest)
+```
+
+
+```{r Setting up the Data}
+data <- read.csv("data/diabetes.csv")
+```
+
+```{r Setting up CV parameters}
+n <- nrow(data)
+p <- ncol(data)
+V <-  5 # Number of Folds
+```
+
+
+# Initial Cross Validation (Exercise 1)
+
+## Logistic Regression using all predictors
+
+## KNN
+
+## Decision Trees (rpart)
+
+## Random Forest
+
+```{r}
+cvSets <- cvFolds(n,V)
+ set.seed(i)
+    samp=sample(n)
+    
+
+```
+
+
+# Model tuning KNN (Exercise 2)
+
+# Repeated K Fold CV (Exercise 3)
+
+## Logistic Regression using all predictors
+
+## KNN with best K from Exercise 2
+
+## Random Forest
+
+## Decision Trees (rpart)
+
+## Plotting results
+
+# Using the `caret` package (Exercise 4)
+
+

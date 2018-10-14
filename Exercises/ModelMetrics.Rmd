@@ -1,0 +1,41 @@
+---
+title: "Model Metrics - Exercises"
+author: "Sarah Romanes"
+date: "13 October 2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data <- read.csv("data/Exam.csv")
+```
+
+
+# RandomForest
+
+```{r}
+library(caret)
+
+fit <- glm(data=data,
+           Label~.,
+           family = binomial(link=logit))
+
+vals <- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], type="response"))
+
+matrix <- confusionMatrix(as.factor(vals), as.factor(data$Label))
+matrix$table
+
+```
+
+# Logistic Regression (GLM)
+
+
+# KNN
+
+# R part
+
