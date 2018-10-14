@@ -83,11 +83,6 @@ class: split-two white
 
 ### Mathematically, Machine Learning problems are simply *optimisation* problems, in which we will use .purple[<i class="fab  fa-r-project "></i>] to help us solve!
 
-
----
-
-# Example of Methods Covered
-
 ---
 
 layout: false
@@ -129,7 +124,7 @@ head(data)
 ## 6  12.08696 26.39895
 ```
 
-### How can we assess how well our line fits the data?
+### How can we assess how well a regression model fits the data?
 
 ]]
 
@@ -152,7 +147,13 @@ class: split-two white
 
 &lt;br&gt;
 
-## Last week we considered fitting a .orange[Linear] fit to this data, resulting in the following... (see here for fitting procedure)
+&lt;br&gt;
+
+&lt;br&gt;
+
+## Last week we considered fitting a .orange[Linear] model to this data, resulting in the following line...
+
+#### (Revise how this was fit [here](https://sarahromanes.github.io/r-ladies-ML-1/#9).)
 
 
 ]]
@@ -176,9 +177,12 @@ class: split-two white
 
 &lt;br&gt;
 
-## Last week we considered fitting a .orange[Linear] fit to this data, resulting in the following... (see here for fitting procedure)
+&lt;br&gt;
 
-## However there are many types of curves we could have fit to this dataset!
+&lt;br&gt;
+
+## ... however there are many types of curves we could have fit to this dataset!
+
 ]]
 
 .column[.content.vmiddle.center[
@@ -196,87 +200,130 @@ class: split-two white
 
 # Is a straight line the best fit?
 
-### Last week we considered fitting a .orange[Linear] fit to this data, resulting in the follows
-
-
-```r
-data &lt;- read.csv("data/Income.csv")
-head(data)
-```
-
-```
-##   Education   Income
-## 1  10.00000 26.65884
-## 2  10.40134 27.30644
-## 3  10.84281 22.13241
-## 4  11.24415 21.16984
-## 5  11.64548 15.19263
-## 6  12.08696 26.39895
-```
-
-### How can we assess how well our line fits the data?
-
-]]
-
-.column[.content.vmiddle.center[
-
-
-&lt;img src="index_files/figure-html/unnamed-chunk-5-1.png" width="504" /&gt;
-
-
-]]
-
----
-
-class: split-two white 
-
-.column.bg-main1[.content[
 &lt;br&gt;
 
-# Is a straight line the best fit?
+&lt;br&gt;
 
-### Last week we considered fitting a .orange[Linear] fit to this data, resulting in the follows
+&lt;br&gt;
 
+## ... however there are many types of curves we could have fit to this dataset!
 
-```r
-data &lt;- read.csv("data/Income.csv")
-head(data)
-```
+&lt;br&gt;
 
-```
-##   Education   Income
-## 1  10.00000 26.65884
-## 2  10.40134 27.30644
-## 3  10.84281 22.13241
-## 4  11.24415 21.16984
-## 5  11.64548 15.19263
-## 6  12.08696 26.39895
-```
-
-### How can we assess how well our line fits the data?
+## Consider now the .orange[*polynomial*] curve of degree 17. Does it fit better than our straight line?
 
 ]]
 
 .column[.content.vmiddle.center[
 
 
-&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" width="504" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-4-1.png" width="504" /&gt;
 
 
 ]]
 
 
+---
+
+class: split-two white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# Regression metrics: the RMSE
+
+&lt;br&gt;
+
+
+# The RMSE is the .orange[Root Mean Squared Error], which is a metric of how far away our fitted line lies away from the observations (on average).
+
+
+
+]]
+.column[.content.vmiddle.center[
+&lt;img src="images/rmse.png", width="80%"&gt;
+]]
+
 
 ---
 
-# RMSE
+class: split-60 white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# Regression metrics: the RMSE
+
+&lt;br&gt;
+
+
+
+```r
+fit.lm &lt;- lm(data=data, Income~Education)
+fit.poly &lt;- lm(data=data, Income~poly(Education, 17))
+
+fitted.vals.lm &lt;- predict(fit.lm, 
+                          data.frame(Education=data$Education))
+fitted.vals.poly &lt;- predict(fit.poly, 
+                            data.frame(Education=data$Education))
+```
+
+#### RMSE - Linear Model 
+
+```r
+sqrt(mean((data$Income-fitted.vals.lm)^2))
+```
+
+```
+## [1] 5.461576
+```
+#### RMSE - Polynomial Model 
+
+```r
+sqrt(mean((data$Income-fitted.vals.poly)^2)) 
+```
+
+```
+## [1] 2.803986
+```
+
+
+]]
+.column.bg-main3[.content.vmiddle.center[
+
+## We can find the RMSE of the two models proposed before.
+
+
+## .orange[The polynomial fit has a lower RMSE. Does this mean we should use it?]
+
+]]
+
+
+---
+# .purple[Bias and Variance]
+
+&lt;br&gt;
+
+## In order to minimise test error on new data points, statistical theory (out of the scope of this workshop) tells us that we need to select a function that achieves *low variance* and *low bias*.
+
+&lt;br&gt;
+
+--
+
+## - .pink[**Variance**] refers to the amount by which our predictions would change if we estimated using a different training set. The more flexible the model, the higher the variance.
+
+--
+
+## - .pink[**Bias**] refers to the error that introduced by the approximation we are making with our model (represent complicated data by a simple model). The more simple the model, the higher the bias.
 
 
 ---
 
 class: middle center bg-main1
 
-# Having a super accurate model is good, right?
+# High variance (over fitted) models can be problematic...
 
 &lt;img src="images/bird.jpg", width="70%"&gt;
 
@@ -284,7 +331,7 @@ class: middle center bg-main1
 
 class: middle center bg-main1
 
-# We don't want a model that is too constrained either!
+# ... as well as high bias (under fitted) models!
 
 &lt;img src="images/constraints.png", width="70%"&gt;
 
@@ -294,7 +341,7 @@ class: middle center bg-main1
 
 &lt;br&gt;
 
-### Machine learning is concerned with finding functions `\(Y=f(X)+\epsilon\)` that best **predict** outputs (responses), given data inputs (predictors).
+## As you may have guessed, there is a trade off between increasing variance (flexibility) and decreasing bias (simplicity) and vice versa.
 
 &lt;br&gt;
 
@@ -306,7 +353,47 @@ class: middle center bg-main1
 
 &lt;br&gt;
 
-### Mathematically, Machine Learning problems are simply *optimisation* problems, in which we will use .purple[<i class="fab  fa-r-project "></i>] to help us solve!
+### This is known as the .pink[Bias-Variance Tradeoff], and will be revisited in the next section!
+
+
+---
+class: split-two white 
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# The middle ground!
+
+&lt;br&gt;
+
+## For this dataset, we might consider the `loess` model as a nice middle ground between bias and variance.
+
+
+```r
+*fit.loess &lt;- loess(data=data, Income~Education)
+fitted.vals.loess &lt;- predict(fit.loess,
+                             data.frame(
+                             Education=data$Education))
+rmse.loess &lt;- sqrt(mean((data$Income-fitted.vals.loess)^2)) 
+rmse.loess
+```
+
+```
+## [1] 3.806408
+```
+
+
+
+
+]]
+
+.column[.content.vmiddle.center[
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="504" /&gt;
+
+
+]]
 
 ---
 
@@ -316,7 +403,7 @@ class: split-two white
 
 &lt;br&gt;
 
-# GLMs revisited
+# The classification setting
 
 &lt;br&gt;
 
@@ -336,104 +423,166 @@ head(data,4)
 ## 4 60.18260 86.30855     1
 ```
 
+
+### How do we assess model accuracy for a classifier?
 ]]
 
 .column[.content.vmiddle.center[
-&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="504" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-11-1.png" width="504" /&gt;
 ]]
+
+---
+class: split-two white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# Classification metrics
+
+&lt;br&gt;
+
+
+# The .orange[Resubstitution Error Rate] is a measure of the proportion of data points we predict correctly when we try to predict all the points we used to fit the model.
+
+
+
+]]
+.column[.content.vmiddle.center[
+&lt;img src="images/rser.png", width="80%"&gt;
+]]
+
 
 ---
 
 class: split-60 white
 
 .column.bg-main1[.content[
-# We can fit the glm in <i class="fab  fa-r-project "></i> using the `glm` function as follows:
+
+&lt;br&gt;
+
+# The Resubstitution Error Rate
 
 &lt;br&gt;
 
 
 ```r
-*fit &lt;-  glm(data=data,
-*           Label ~ .,
-*           family=binomial(link="logit"))
-summary(fit)
-```
-
-```r
-Call:
-glm(formula = Label ~ ., family = binomial(link = "logit"), 
-    data = data)
-
-Deviance Residuals: 
-     Min        1Q    Median        3Q       Max  
--2.19287  -0.18009   0.01577   0.19578   1.78527  
-
-Coefficients:
-             Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept) -25.16133    5.79836  -4.339 1.43e-05 ***
-Exam1         0.20623    0.04800   4.297 1.73e-05 ***
-Exam2         0.20147    0.04862   4.144 3.42e-05 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-```
-]]
-.column.bg-main3[.content.vmiddle.center[
-# We fit a `glm` against all predictors like we did last week.
-]]
-
----
-
-class: split-60 white
-
-.column.bg-main1[.content[
-# We can fit the glm in <i class="fab  fa-r-project "></i> using the `glm` function as follows:
-
-&lt;br&gt;
-
-
-```r
-*fit &lt;-  glm(data=data,
+*fit.glm &lt;-  glm(data=data,
 *           Label ~ .,
 *           family=binomial(link="logit"))
 ```
-
-```r
-fitted.vals &lt;- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
-                             type="response"))
-```
+ 
 ]]
 .column.bg-main3[.content.vmiddle.center[
-# We can find the .orange[*Resubstitution Error Rate*] by predicting the values of all our data points using our fitted model.
+# First, we fit a `glm` against all predictors like we did last week.
 ]]
 
 ---
 
-
 class: split-60 white
 
 .column.bg-main1[.content[
-# Confusion table
+&lt;br&gt;
+
+# The Resubstitution Error Rate
+
 
 &lt;br&gt;
 
 
 ```r
-*fit &lt;-  glm(data=data,
-*           Label ~ .,
+fit.glm &lt;-  glm(data=data, 
+            Label ~ ., 
             family=binomial(link="logit"))  
+
+*fitted.vals &lt;- round(predict(fit.glm,
+*                            newdata = data[, c("Exam1", "Exam2")],
+*                            type="response"))
 ```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# We then predict the values of all the data points we used to build the model.
+#### (Remember, for `glm`, we predict the *probability* of being class 1, and then round).
+
+]]
+
+---
+
+
+class: split-60 white
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# The Resubstitution Error Rate
+
+
+&lt;br&gt;
+
 
 ```r
-fitted.vals &lt;- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
-                             type="response"))
+fit.glm &lt;-  glm(data=data, 
+            Label ~ ., 
+            family=binomial(link="logit"))  
 
+fitted.vals &lt;- round(predict(fit.glm,
+                             newdata = data[, c("Exam1", "Exam2")], 
+                             type="response")) 
+*err &lt;- mean(fitted.vals!=data$Label)
+err
+```
+
+```
+## [1] 0.11
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# We can then find the .orange[*resubstitution error rate*] by looking at the proportion of labels that were not correctly predicted.
+
+]]
+
+
+---
+
+
+class: split-60 white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# The Confusion Matrix <i class="fas  fa-question-circle "></i>
+
+&lt;br&gt;
+
+
+```r
+fit.glm &lt;-  glm(data=data, 
+            Label ~ ., 
+            family=binomial(link="logit"))  
+fitted.vals &lt;- round(predict(fit.glm, 
+                             newdata = data[, c("Exam1", "Exam2")], 
+                             type="response"))
+```
+
+
+```r
 library(caret)
-*C.matrix &lt;- confusionMatrix(as.factor(data$Label), as.factor(fitted.vals))
-c.matrix$table
+*confusion.glm &lt;- confusionMatrix(as.factor(fitted.vals),
+*                                as.factor(data$Label))
+confusion.glm$table
+```
+
+```
+##           Reference
+## Prediction  0  1
+##          0 34  5
+##          1  6 55
 ```
 ]]
 .column.bg-main3[.content.vmiddle.center[
 ## We can examine how our model predicted all the data points, using `confusionMatrix` from the `caret` package. Note, that we are required to put in factor inputs.
+
 ]]
 
 
@@ -442,26 +591,41 @@ c.matrix$table
 class: split-60 white
 
 .column.bg-main1[.content[
-# Confusion table
+
+&lt;br&gt;
+
+# The Confusion Matrix <i class="fas  fa-question-circle "></i>
 
 &lt;br&gt;
 
 
 ```r
-*fit &lt;-  glm(data=data,
-*           Label ~ .,
+fit.glm &lt;-  glm(data=data, 
+            Label ~ ., 
             family=binomial(link="logit"))  
-fitted.vals &lt;- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], 
+fitted.vals &lt;- round(predict(fit.glm, 
+                             newdata = data[, c("Exam1", "Exam2")], 
                              type="response"))
+```
 
+
+```r
 library(caret)
-C.matrix &lt;- confusionMatrix(as.factor(fitted.vals), 
-                            as.factor(data$Label)) 
-*c.matrix$table
+*confusion.glm &lt;- confusionMatrix(as.factor(fitted.vals),
+*                                as.factor(data$Label))
+*confusion.glm$table
+```
+
+```
+##           Reference
+## Prediction  0  1
+##          0 34  5
+##          1  6 55
 ```
 ]]
 .column.bg-main3[.content.vmiddle.center[
-## Looking at the `table` output, reading *vertically*, we can assess model performance. Out of the 40 failures in our dataset, GLM sucessfully predicts 34. Out of the 60 passes in oue data, GLM sucessfully predicts 55.
+
+## Looking at the `table` output, reading *vertically*, we can assess model performance. Out of the 40 failures in our dataset, `glm` sucessfully predicts 34. Out of the 60 passes in our data, `glm` sucessfully predicts 55.
 ]]
 
 
@@ -477,7 +641,10 @@ class: middle center bg-main1
 class: split-60 white
 
 .column.bg-main1[.content[
-# Classifying and assessing model fit for Pima Indians Diabetes
+
+&lt;br&gt;
+
+# Classifying and assessing model fit for Diabetes data
 
 &lt;br&gt;
 
@@ -503,8 +670,6 @@ str(data)
  $ pedigree : num  0.627 0.351 0.672 0.167 2.288 ...
  $ age      : int  50 31 32 21 33 30 26 29 53 54 ...
 *$ class    : int  1 0 1 0 1 0 1 0 1 1 ...
-
-data$class &lt;- as.factor(data$class)
 ```
 
 
@@ -513,7 +678,10 @@ data$class &lt;- as.factor(data$class)
 
 
 .column.bg-main3[.content.vmiddle.center[
-# Assess the performance of a classification method of .orange[*your choice*] on classifying `class`.
+
+# Build a machine learning model to predict whether or not the patients in the dataset have diabetes (`class`).
+
+# Further, assess the performance of .orange[*your model*] on classifying `class`.
 ]]
 
 ---
@@ -533,13 +701,110 @@ class: bg-main3 split-30 hide-slide-number
 
 ---
 
-# What to do with all the metrics?
+class: middle center bg-main1
+
+# Building reliable and accurate models is paramount in machine learning...
+
+&lt;img src="images/netflix.jpg", width="70%"&gt;
+
 
 ---
 
-# Training and test set
+class: middle center bg-main1
 
-Often, we want to see how well our model can predict new data points. However, it is often impossible to get completely new data. So, we split our data into *training* and *testing* sets to evaluate performance, treating the *testing* data as new data points.
+# ... however, it can be hard to get new data to assess model performance!
+
+&lt;img src="images/newdata.jpg", width="70%"&gt;
+---
+
+class: split-two white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# Cross Validation
+
+&lt;br&gt;
+
+
+##  Often, we want to see how well our model can predict new data points. However, it is often impossible to get completely new data.
+
+## So, we split our data into *training* and *testing* sets to evaluate performance, treating the *testing* data as new data points.
+
+
+]]
+.column[.content.vmiddle.center[
+&lt;img src="images/CV.png", width="80%"&gt;
+]]
+
+
+---
+
+class: split-two white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# Cross Validation
+
+&lt;br&gt;
+
+## To do this, we split our data into .orange[K-Folds]
+
+## The first fold is treated as a testing set, and the method is fit on the remaining K − 1 folds. 
+
+
+
+]]
+.column[.content.vmiddle.center[
+&lt;img src="images/CV.png", width="80%"&gt;
+]]
+
+---
+
+class: split-two white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# Cross Validation
+
+&lt;br&gt;
+
+
+## The misclassification error rate is then computed on the observations in the held-out fold. This procedure is repeated K times; each time, a different group of observations is treated as a testing set.
+
+
+]]
+.column[.content.vmiddle.center[
+&lt;img src="images/CV.png", width="80%"&gt;
+]]
+
+
+---
+
+class: split-two white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# Cross Validation
+
+&lt;br&gt;
+
+
+# The .orange[CV error rate] is then calculated as the average of these K error rates.
+
+
+]]
+.column[.content.vmiddle.center[
+&lt;img src="images/CV.png", width="80%"&gt;
+]]
+
 
 ---
 
@@ -549,17 +814,42 @@ Often, we want to see how well our model can predict new data points. However, i
 
 &lt;center&gt;
 
-  &lt;img src="images/splits.png", width="75%"&gt;
+  &lt;img src="images/splits.png", width="70%"&gt;
 
 &lt;/center&gt;
 
 &lt;br&gt;
 
-
+#### Generally, .pink[k between 5 and 10] avoids over-training the model (variance), whilst avoiding too few training points (bias).
 
 ---
 
-# Bias Variance Trade off - Revisited
+class: split-60 white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# 5-fold CV for Diabetes `knn` model 
+
+&lt;br&gt;
+
+
+```r
+library(class) # for KNN function
+
+K &lt;-  5 # number of folds
+n &lt;- nrow(data) # number of data points
+
+X &lt;- data[,-9] # predictors
+y &lt;- as.factor(data$class) # response
+```
+
+
+]]
+.column.bg-main3[.content.vmiddle.center[
+# Let's perform a .orange[5-fold] CV for the `knn` model.  First, we split up our response and predictors.
+]]
 
 
 ---
@@ -567,11 +857,57 @@ Often, we want to see how well our model can predict new data points. However, i
 class: split-60 white
 
 .column.bg-main1[.content[
-# K-fold CV in R using `cvTools`
+
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
 
 &lt;br&gt;
 
 
+```r
+library(cvTools)
+set.seed(1)
+*cvSets &lt;- cvFolds(n,K)
+```
+
+
+
+```r
+str(cvSets)
+List of 5
+ $ n      : num 768 
+ $ K      : num 5
+ $ R      : num 1
+ $ subsets: int [1:768, 1] 110 386 469 511 39 485 741 563 572 759 ... 
+ $ which  : int [1:768] 1 2 3 4 5 1 2 3 4 5 ... 
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+##  Using the `cvTools` package, we can use the function `cvFolds` to seperate our `n` data points into `K` paritions for cross validation.
+
+#### Note, we `set.seed(1)` to ensure reproducible results.
+]]
+
+
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
+
+&lt;br&gt;
+
+
+```r
+library(cvTools)
+set.seed(1)
+cvSets &lt;- cvFolds(n,K) 
+```
 
 
 
@@ -586,7 +922,47 @@ List of 5
 ```
 ]]
 .column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
+##  The important outputs are `subsets` and `which`. 
+&lt;br&gt;
+
+## For each fold (given by `which`), `subset` tells us which index of the data belongs to what fold. Eg, datapoint 110 belongs to fold 1, etc
+]]
+---
+
+class: split-60 white
+
+.column.bg-main1[.content[
+
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
+
+&lt;br&gt;
+
+
+```r
+error.fold &lt;- c()
+*for(j in 1:K){
+  
+  fold.j &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[fold.j]
+  
+  X.test &lt;- X[test.inds,]
+  X.train &lt;- X[-test.inds,]
+  y.test &lt;- y[test.inds]
+  y.train &lt;- y[-test.inds]
+  
+  fit &lt;- knn(X.train, X.test, y.train, k=9)
+  
+  error.fold[j] &lt;- sum(fit!=y.test)
+*} 
+
+cv.error &lt;- sum(error.fold)/n
+cv.error
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# Now, we set up a for loop to iterate through the test/training folds.
 ]]
 
 ---
@@ -594,28 +970,26 @@ List of 5
 class: split-60 white
 
 .column.bg-main1[.content[
-# K-fold CV using `cvTools`
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
 
 &lt;br&gt;
 
 
-
-
-
 ```r
-*set.seed(1)
-
-for(j in 1:V){
+error.fold &lt;- c()
+for(j in 1:K){ 
   
-  inds &lt;- which(cvSets$which==j)
-  test.inds &lt;- cvSets$subsets[inds]
+* fold.j &lt;- which(cvSets$which==j)
+* test.inds &lt;- cvSets$subsets[fold.j]
   
   X.test &lt;- X[test.inds,]
   X.train &lt;- X[-test.inds,]
   y.test &lt;- y[test.inds]
   y.train &lt;- y[-test.inds]
   
-  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  fit &lt;- knn(X.train, X.test, y.train, k=9)
   
   error.fold[j] &lt;- sum(fit!=y.test)
 }
@@ -625,47 +999,7 @@ cv.error
 ```
 ]]
 .column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
-]]
-
-
----
-
-class: split-60 white
-
-.column.bg-main1[.content[
-# K-fold CV using `cvTools`
-
-&lt;br&gt;
-
-
-
-
-
-```r
-set.seed(1)
-
-*for(j in 1:V){
-  
-  inds &lt;- which(cvSets$which==j)
-  test.inds &lt;- cvSets$subsets[inds]
-  
-  X.test &lt;- X[test.inds,]
-  X.train &lt;- X[-test.inds,]
-  y.test &lt;- y[test.inds]
-  y.train &lt;- y[-test.inds]
-  
-  fit &lt;- knn(X.train, X.test, y.train, k=4)
-  
-  error.fold[j] &lt;- sum(fit!=y.test)
-}
-
-cv.error &lt;- sum(error.fold)/n
-cv.error
-```
-]]
-.column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
+# We determine which indices belong to the current fold, and determine which indices are to be designated as *testing*.
 ]]
 
 ---
@@ -673,67 +1007,27 @@ cv.error
 class: split-60 white
 
 .column.bg-main1[.content[
-# K-fold CV using `cvTools`
+
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
 
 &lt;br&gt;
 
 
-
-
-
 ```r
-set.seed(1)
-
-for(j in 1:V){
+error.fold &lt;- c()
+for(j in 1:K){ 
   
-* inds &lt;- which(cvSets$which==j)
-* test.inds &lt;- cvSets$subsets[inds]
-  
-  X.test &lt;- X[test.inds,]
-  X.train &lt;- X[-test.inds,]
-  y.test &lt;- y[test.inds]
-  y.train &lt;- y[-test.inds]
-  
-  fit &lt;- knn(X.train, X.test, y.train, k=4)
-  
-  error.fold[j] &lt;- sum(fit!=y.test)
-}
-
-cv.error &lt;- sum(error.fold)/n
-cv.error
-```
-]]
-.column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
-]]
-
----
-
-class: split-60 white
-
-.column.bg-main1[.content[
-# K-fold CV using `cvTools`
-
-&lt;br&gt;
-
-
-
-
-
-```r
-set.seed(1)
-
-for(j in 1:V){
-  
-  inds &lt;- which(cvSets$which==j)
-  test.inds &lt;- cvSets$subsets[inds]
+  fold.j &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[fold.j]
   
 * X.test &lt;- X[test.inds,]
 * X.train &lt;- X[-test.inds,]
 * y.test &lt;- y[test.inds]
 * y.train &lt;- y[-test.inds]
   
-  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  fit &lt;- knn(X.train, X.test, y.train, k=9)
   
   error.fold[j] &lt;- sum(fit!=y.test)
 }
@@ -743,7 +1037,7 @@ cv.error
 ```
 ]]
 .column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
+# We then form *training* and *testing* data and response objects.
 ]]
 
 ---
@@ -751,28 +1045,26 @@ cv.error
 class: split-60 white
 
 .column.bg-main1[.content[
-# K-fold CV using `cvTools`
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
 
 &lt;br&gt;
 
 
-
-
-
 ```r
-set.seed(1)
-
-for(j in 1:V){
+error.fold &lt;- c()
+for(j in 1:K){
   
-  inds &lt;- which(cvSets$which==j)
-  test.inds &lt;- cvSets$subsets[inds]
+  fold.j &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[fold.j]
   
   X.test &lt;- X[test.inds,]
   X.train &lt;- X[-test.inds,]
   y.test &lt;- y[test.inds]
   y.train &lt;- y[-test.inds]
   
-* fit &lt;- knn(X.train, X.test, y.train, k=4)
+* fit &lt;- knn(X.train, X.test, y.train, k=9)
   
   error.fold[j] &lt;- sum(fit!=y.test)
 }
@@ -782,7 +1074,7 @@ cv.error
 ```
 ]]
 .column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
+# We **train** our model using `X.train` and `y.train`, and predict new class labels values based on `X.test`.
 ]]
 
 ---
@@ -790,28 +1082,26 @@ cv.error
 class: split-60 white
 
 .column.bg-main1[.content[
-# K-fold CV using `cvTools`
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
 
 &lt;br&gt;
 
 
-
-
-
 ```r
-set.seed(1)
-
-for(j in 1:V){
+error.fold &lt;- c()
+for(j in 1:K){ 
   
-  inds &lt;- which(cvSets$which==j)
-  test.inds &lt;- cvSets$subsets[inds]
+  fold.j &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[fold.j]
   
   X.test &lt;- X[test.inds,]
   X.train &lt;- X[-test.inds,]
   y.test &lt;- y[test.inds]
   y.train &lt;- y[-test.inds]
   
-  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  fit &lt;- knn(X.train, X.test, y.train, k=9)
   
 * error.fold[j] &lt;- sum(fit!=y.test)
 }
@@ -821,7 +1111,7 @@ cv.error
 ```
 ]]
 .column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
+# We then see how well we were able to match the true test labels, `y.test`. We store this, as we repeat this K times in total.
 ]]
 
 
@@ -830,28 +1120,26 @@ cv.error
 class: split-60 white
 
 .column.bg-main1[.content[
-# K-fold CV using `cvTools`
+&lt;br&gt;
+
+# K-fold CV in <i class="fab  fa-r-project "></i> using `cvTools`
 
 &lt;br&gt;
 
 
-
-
-
 ```r
-set.seed(1)
-
-for(j in 1:V){
+error.fold &lt;- c()
+for(j in 1:K){ 
   
-  inds &lt;- which(cvSets$which==j)
-  test.inds &lt;- cvSets$subsets[inds]
+  fold.j &lt;- which(cvSets$which==j)
+  test.inds &lt;- cvSets$subsets[fold.j]
   
   X.test &lt;- X[test.inds,]
   X.train &lt;- X[-test.inds,]
   y.test &lt;- y[test.inds]
   y.train &lt;- y[-test.inds]
   
-  fit &lt;- knn(X.train, X.test, y.train, k=4)
+  fit &lt;- knn(X.train, X.test, y.train, k=9)
   
   error.fold[j] &lt;- sum(fit!=y.test)
 }
@@ -859,9 +1147,13 @@ for(j in 1:V){
 *cv.error &lt;- sum(error.fold)/n
 cv.error
 ```
+
+```
+## [1] 0.2630208
+```
 ]]
 .column.bg-main3[.content.vmiddle.center[
-# This tells the `lm` function what data we are referring to.
+# Since each data point gets tested **exactly once**, we can calculate the cross validation error as the sum of the total errors, divided through by the number of samples.
 ]]
 
 ---
@@ -875,8 +1167,24 @@ class: middle center bg-main1
 
 ---
 
-# Dettermine best value of K.
-# Repeat exercise but for RandomForest instead of KNN. Which performs better?
+class: split-two white 
+
+.column.bg-main1[.content.vmiddle.center[
+
+# .orange[Task 1]
+
+## We want to know which value of k (neighbours) from `k.vals = 1:50` fits the data best. Embed the CV loop on the previous slide in another loop to determine which value of `k` gives the lowest error.
+
+]]
+
+.column.bg-main3[.content.vmiddle.center[
+
+
+# .orange[Task 2]
+
+## Fit a CV loop for `randomForest`. Does it perform better than the best value of `k` you found in Task 1?
+
+]]
 
 
 ---
@@ -884,6 +1192,8 @@ class: middle center bg-main1
 # .purple[Repeated K fold CV]
 
 &lt;br&gt;
+
+## Often we want to repeat the CV process, to get a range of error values.
 
 &lt;center&gt;
 
@@ -891,13 +1201,13 @@ class: middle center bg-main1
 
 &lt;/center&gt;
 
-&lt;br&gt;
-
 ---
 
 # .purple[Repeated K fold CV]
 
 &lt;br&gt;
+
+## Often we want to repeat the CV process, to get a range of error values.
 
 &lt;center&gt;
 
@@ -905,13 +1215,13 @@ class: middle center bg-main1
 
 &lt;/center&gt;
 
-&lt;br&gt;
-
 
 ---
 # .purple[Repeated K fold CV]
 
 &lt;br&gt;
+
+## Often we want to repeat the CV process, to get a range of error values.
 
 &lt;center&gt;
 
@@ -919,29 +1229,33 @@ class: middle center bg-main1
 
 &lt;/center&gt;
 
-&lt;br&gt;
-
-
 
 ---
 
-# Example pima indians KNN
+
+
+class: split-60 white
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Repeated K-fold CV in <i class="fab  fa-r-project "></i>
+
+&lt;br&gt;
 
 
 ```r
-cv.error &lt;- c()
-for(i in 1:reps){
-  
+*reps &lt;- 10
+*cv.error &lt;- c()
+*for(i in 1:reps){
   set.seed(i)
-  
-  cvSets &lt;- cvFolds(n,V)
+  cvSets &lt;- cvFolds(n,K)
   
   error.fold &lt;- c()
-  for(j in 1:V){
+  for(j in 1:K){
     
-    inds &lt;- which(cvSets$which==j)
-        
-    test.inds &lt;- cvSets$subsets[inds]
+    fold.j &lt;- which(cvSets$which==j)
+    test.inds &lt;- cvSets$subsets[fold.j]
     
     X.test &lt;- X[test.inds,]
     X.train &lt;- X[-test.inds,]
@@ -952,11 +1266,36 @@ for(i in 1:reps){
     
     error.fold[j] &lt;- sum(fit!=y.test)
   }
-  
-  cv.error[i] &lt;- sum(error.fold)/n
-  
-}
+* cv.error[i] &lt;- sum(error.fold)/n
+*} 
 ```
+]]
+.column.bg-main3[.content.vmiddle.center[
+# To peform a **repeated** cross validation, all we do is embed our existing CV loop into another loop that repeats the process `reps` times.
+]]
+---
+class: split-two white
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Repeated K-fold CV in <i class="fab  fa-r-project "></i>
+
+&lt;br&gt;
+
+&lt;br&gt;
+
+# We can then easily visualise our repeated cross validation errors!
+
+
+]]
+.column[.content.vmiddle.center[
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-34-1.png" width="504" /&gt;
+
+
+]]
 
 ---
 
@@ -968,7 +1307,25 @@ class: middle center bg-main1
 
 ---
 
-# Repeat for RandomForest, and plot the results
+class: split-two white 
+
+.column.bg-main1[.content.vmiddle.center[
+
+# .orange[Task 1]
+
+## Perform a 10 repeat, 5 fold Cross Validation, for `randomForest`.
+
+]]
+
+.column.bg-main3[.content.vmiddle.center[
+
+
+# .orange[Task 2]
+
+## Boxplot the results of `knn` (with best k) vs `randomForest`. Which model performs better?
+
+]]
+
 
 ---
 
@@ -986,38 +1343,138 @@ class: bg-main3 split-30 hide-slide-number
 
 
 ---
+class: split-60 white
 
-# We can repeat the CV process for KNN in a much easier way using the caret package.
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Easy K-fold CV in <i class="fab  fa-r-project "></i>!
+
+&lt;br&gt;
+
+
+
 
 
 ```r
-fitControl &lt;- trainControl(## 5-fold CV
-                           method = "repeatedcv",
-                           number =5,
-                           ## repeated ten times
-                           repeats = 10)
+*fitControl &lt;- trainControl(## 5-fold CV
+*                          method = "repeatedcv",
+*                          number =5,
+*                          ## repeated ten times
+*                          repeats = 10)
 
-set.seed(825)
+set.seed(1)
 knnFit1 &lt;- train(class ~ ., data = data, 
                  method = "knn", 
                  trControl = fitControl)
 knnFit1
 ```
+]]
+.column.bg-main3[.content.vmiddle.center[
+
+# Using the `caret` package, we first set up details of of CV, including how many repeats we want, and how many folds.
+]]
+
+---
+class: split-60 white
+
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# Easy K-fold CV in <i class="fab  fa-r-project "></i>!
+
+
+
+```r
+*knnFit1 &lt;- train(class ~ ., data = data,
+*                method = "knn",
+*                trControl = fitControl)
+knnFit1
+```
+
+```
+## k-Nearest Neighbors 
+## 
+## 768 samples
+##   8 predictor
+##   2 classes: '0', '1' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 10 times) 
+## Summary of sample sizes: 615, 614, 614, 614, 615, 614, ... 
+## Resampling results across tuning parameters:
+## 
+##   k  Accuracy   Kappa    
+##   5  0.7143664  0.3508650
+##   7  0.7255573  0.3751169
+##   9  0.7350547  0.3936117
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was k = 9.
+```
+]]
+.column.bg-main3[.content.vmiddle.center[
+
+# Next, we specify the response and its predictors, as well as what method we want to use, and the training parameters. .orange[**So easy!**]
+
+#### (Note, Accuracy is 1-CV Error).
+]]
 
 ---
 
-# But why so much work?
+class: split-two white 
 
-- Not all methods are covered by caret
-- Much easier to understand how CV works by building it yourslef.
+.column.bg-main1[.content[
+&lt;br&gt;
+
+# But, but, why make us do all that work before??
+
+&lt;br&gt;
+
+
+### - Not every machine learning method is covered by the `caret` package, so it is important you know how to code up your own.
+
+&lt;br&gt;
+
+### - Also, by knowing how to code up the CV from scratch, you will have a deeper understanding of how it works!
+
+
+]]
+
+.column[.content.vmiddle.center[
+
+&lt;iframe src="https://giphy.com/embed/9G3wg7lH5DpxC" width="467" height="480" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/9G3wg7lH5DpxC"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;
+
+]]
+
 
 ---
 
+class: middle center bg-main1
 
+# Your turn!
 
+## <span>&lt;i class="fas  fa-sync-alt fa-4x faa-spin animated "&gt;&lt;/i&gt;</span>
+---
 
+class: middle center bg-main3
+
+# Fit a 10 repeat, 5 fold CV for `knn` and `randomForest` using `caret`. Do you get similar results to manual CV?
+
+## You can find the method specifications for `caret` [here](https://rdrr.io/cran/caret/man/models.html).
 
 ---
+
+class: bg-main1
+
+# Big thanks go to:
+
+&lt;br&gt;
+
+## - Emi Tanaka for developing the Kunoichi themed slides, and also Yihui Xie for developing `xaringan`!
+## - The R-Ladies Sydney organisers - you guys rock!
+
+## <span>&lt;i class="fas  fa-thumbs-up fa-5x faa-float animated "&gt;&lt;/i&gt;</span>
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({

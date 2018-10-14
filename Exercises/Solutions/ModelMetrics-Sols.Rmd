@@ -45,7 +45,7 @@ rpart.plot(rpart.fit) # Can also visualise to see the classification rules.
 
 # Resubstitution error rate
 fitted.vals <- predict(rpart.fit, X, type="class")
-rer.rpart <- length(which(fitted.vals!=y))/length(y)
+rer.rpart <- mean(fitted.vals!=y)
 rer.rpart
 
 # Confusion matrix
@@ -67,7 +67,7 @@ rf.fit <- randomForest(class~., data=data)
 
 # Resubstitution error rate
 fitted.vals <- predict(rf.fit, X)
-rer.rf <- length(which(fitted.vals!=y))/length(y)
+rer.rf <- mean(fitted.vals!=y)
 rer.rf
 
 # Confusion matrix
@@ -87,7 +87,7 @@ confusion.rf$overall["Accuracy"] # Note that Accuracy is just 1-rer.rf
 fitted.vals <- as.factor(knn(X, X, y, k=9))
 
 # Resubstitution error rate
-rer.knn <- length(which(fitted.vals!=y))/length(y)
+rer.knn <- mean(fitted.vals!=y)
 rer.knn
 
 # Confusion matrix
@@ -111,7 +111,7 @@ glm.fit <- glm(class~.,
 
 # Resubstitution error rate
 fitted.vals <- as.factor(round(predict(glm.fit, X, type="response")))
-rer.glm <- length(which(fitted.vals!=y))/length(y)
+rer.glm <- mean(fitted.vals!=y)
 rer.glm
 
 # Confusion matrix
