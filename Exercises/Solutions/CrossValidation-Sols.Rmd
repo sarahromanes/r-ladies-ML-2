@@ -50,6 +50,7 @@ cvSets <- cvFolds(n,K) # permute all the data, into 5 folds
 
 k.vals <- 1:50 #test neighbours from 1 NN to 50 NN
 
+# For each k fit a knn classifier and calculate the cv error
 knn.cv.error <- c()
 for(i in k.vals){
 
@@ -57,9 +58,9 @@ for(i in k.vals){
   
   for(j in 1:K){
     inds <- which(cvSets$which==j)
-        
     test.inds <- cvSets$subsets[inds]
     
+    # separate training and test sets
     X.test <- X[test.inds,]
     X.train <- X[-test.inds,]
     y.test <- y[test.inds]

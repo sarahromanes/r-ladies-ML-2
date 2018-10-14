@@ -1,41 +1,45 @@
 ---
 title: "Model Metrics - Exercises"
-author: "Sarah Romanes"
+author: "A Cool R-Lady"
 date: "13 October 2018"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-```{r}
-data <- read.csv("data/Exam.csv")
-```
-
-
-# RandomForest
-
-```{r}
+```{r Packages}
+library(class)
+library(randomForest)
+library(ggplot2)
 library(caret)
-
-fit <- glm(data=data,
-           Label~.,
-           family = binomial(link=logit))
-
-vals <- round(predict(fit, newdata = data[, c("Exam1", "Exam2")], type="response"))
-
-matrix <- confusionMatrix(as.factor(vals), as.factor(data$Label))
-matrix$table
-
+library(rpart)
+library(rpart.plot)
 ```
 
-# Logistic Regression (GLM)
+
+```{r Setting up the Data}
+data <- read.csv("data/diabetes.csv")
+data$class <- as.factor(data$class) #remember, classification method require our response variable to be a factor!
+```
+
+```{r Explore the data}
+head(data)
+str(data)
 
 
-# KNN
+# Seperate Responses (for the case of KNN, and for prediction)
+X <- data[,-9] # Everything except last column
+y <- data$class
+```
 
-# R part
+```{r Your classification method goes here}
+
+# Fit the model
+
+# Find the resubstitution error rate
+
+# Print the confusion matrix
+
+```
 
