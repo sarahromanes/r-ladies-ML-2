@@ -7,64 +7,260 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Set Up
+Disclaimer - for the code below, you could make it much "nicer" if for-loops aren't your thing. Further, you could create a CV function and use it throughout the document. I however keep everything repeated and in for-loops so that the concepts are clear and repeated, and that we are always reminded of the process that is going on.
 
-```{r Loading Packages}
-library(cvTools) 
-library(caret)
+# Setting up (Packages/Data/Etc)
 
-
-# ML methods
+```{r Packages}
 library(class)
-library(rpart)
 library(randomForest)
+library(cvTools)
+library(ggplot2)
+library(caret)
 ```
 
 
 ```{r Setting up the Data}
 data <- read.csv("data/diabetes.csv")
+data$class <- as.factor(data$class) #remember, classification method require our response variable to be a factor!
+```
+
+```{r Explore the data}
+head(data)
+str(data)
+
+
+# Seperate Responses
+X <- data[,-9] # Everything except last column
+y <- data$class
 ```
 
 ```{r Setting up CV parameters}
-n <- nrow(data)
-p <- ncol(data)
-V <-  5 # Number of Folds
+n <- nrow(X)
+K <- 5 # Choose 5 fold CV
 ```
 
 
-# Initial Cross Validation (Exercise 1)
+# Exercise 1) CV loop for different values of k for KNN
 
-## Logistic Regression using all predictors
+```{r KNN values of K}
+set.seed(1)
 
-## KNN
+cvSets <- cvFolds(n,K) # permute all the data, into 5 folds
 
-## Decision Trees (rpart)
+k.vals <- 1:50 #test neighbours from 1 NN to 50 NN
 
-## Random Forest
+knn.cv.error <- c()
+for(i in k.vals){
+
+  error.fold <- c()
+  
+  for(j in 1:K){
+    inds <- which(cvSets$which==j)
+        
+    test.inds <- cvSets$subsets[inds]
+    
+    X.test <- X[test.inds,]
+    X.train <- X[-test.inds,]
+    y.test <- y[test.inds]
+    y.train <- y[-test.inds]
+    
+    fit <- knn(X.train, X.test, y.train, k=k.vals[i])
+    
+    error.fold[j] <- sum(fit!=y.test)
+  }
+  
+  knn.cv.error[i] <- sum(error.fold)/n
+}
+
+knn.cv.error
+
+best.k <- which.min(knn.cv.error)
+best.k
+```
+
+We can plot the error as a function of *k*.
+
+```{r plotting}
+errors <- data.frame(k.vals = k.vals, knn.cv.error=knn.cv.error)
+
+ggplot(errors, aes(x=k.vals, y=knn.cv.error)) + geom_line() + 
+  xlab("Value of k neighbours") + 
+  ylab("5-Fold CV error") +
+  ggtitle("5 fold CV for KNN for Diabetes dataset")
+```
+
+The best value of k, for a *single CV run*, is k=21.
+
+# Exercise 2) CV loop for randomForest
 
 ```{r}
-cvSets <- cvFolds(n,V)
- set.seed(i)
-    samp=sample(n)
+
+set.seed(1)
+
+cvSets <- cvFolds(n,K)
+
+error.fold <- c()
+  
+for(j in 1:K){
+  
+  inds <- which(cvSets$which==j)
+  
+  test.inds <- cvSets$subsets[inds]
+  
+  X.test <- X[test.inds,]
+  X.train <- X[-test.inds,]
+  y.test <- y[test.inds]
+  y.train <- y[-test.inds]
+  
+  rf.model <- randomForest(X.train, y.train)
+  fit <- predict(rf.model, X.test)
+  
+  error.fold[j] <- sum(fit!=y.test)
+}
+  
+rf.cv.error <- sum(error.fold)/n
+rf.cv.error
+
+```
+
+We can see that randomForest is outperforming KNN.
+
+# Exercise 3) Repeated CV loop for KNN (10 times) using the best K value
+
+```{r repeated KNN CV loop}
+
+reps <- 10
+
+knn.rep.cv.error <- c()
+for(i in 1:reps){
+  
+  set.seed(i)
+  
+  cvSets <- cvFolds(n,K)
+  
+  error.fold <- c()
+  for(j in 1:K){
     
+    inds <- which(cvSets$which==j)
+    test.inds <- cvSets$subsets[inds]
+    
+    X.test <- X[test.inds,]
+    X.train <- X[-test.inds,]
+    y.test <- y[test.inds]
+    y.train <- y[-test.inds]
+    
+    fit <- knn(X.train, X.test, y.train, k=best.k)
+    
+    error.fold[j] <- sum(fit!=y.test)
+  }
+  
+  knn.rep.cv.error[i] <- sum(error.fold)/n
+  
+}
+
+knn.rep.cv.error
 
 ```
 
 
-# Model tuning KNN (Exercise 2)
 
-# Repeated K Fold CV (Exercise 3)
+# Exercise 4) Repeated CV loop for randomForest
 
-## Logistic Regression using all predictors
+```{r repeated randomForest CV loop}
 
-## KNN with best K from Exercise 2
+reps <- 10
 
-## Random Forest
+rf.rep.cv.error <- c()
+for(i in 1:reps){
+  
+  set.seed(i)
+  
+  cvSets <- cvFolds(n,K)
+  
+  error.fold <- c()
+  for(j in 1:K){
+    
+    inds <- which(cvSets$which==j)
+    test.inds <- cvSets$subsets[inds]
+    
+    X.test <- X[test.inds,]
+    X.train <- X[-test.inds,]
+    y.test <- y[test.inds]
+    y.train <- y[-test.inds]
+    
+    rf.model <- randomForest(X.train, y.train)
+    fit <- predict(rf.model, X.test)
+  
+    error.fold[j] <- sum(fit!=y.test)
+  }
+  
+  rf.rep.cv.error[i] <- sum(error.fold)/n
+  
+}
 
-## Decision Trees (rpart)
+rf.rep.cv.error
 
-## Plotting results
+```
 
-# Using the `caret` package (Exercise 4)
+We can compare the CV results between KNN and RF easily (using base boxplot - I know!)
+
+```{r quick compare}
+boxplot(knn.rep.cv.error, rf.rep.cv.error, main="10 Repeat, 5 Fold CV on Diabetes data", ylab="5 Fold CV errors", xlab="Method", names=c("KNN", "RF"))
+```
 
 
+
+
+# Exercise 5) Using the `caret` package and comparing results
+
+```{r caret for KNN}
+fitControl <- trainControl(## 5-fold CV
+                           method = "repeatedcv",
+                           number =5,
+                           ## repeated ten times
+                           repeats = 10)
+
+set.seed(1)
+knnFit1 <- train(class ~ ., data = data, 
+                 method = "knn", 
+                 trControl = fitControl)
+knnFit1
+
+cv.err.knn <- 1-knnFit1$results$Accuracy[3]
+```
+
+```{r caret for RF}
+
+set.seed(1)
+rfFit1 <- train(class ~ ., data = data, 
+                 method = "rf", 
+                 trControl = fitControl) #same fitControl as KNN
+rfFit1
+
+cv.err.rf <- 1-rfFit1$results$Accuracy[1]
+
+```
+
+```{r caret for GLM}
+
+set.seed(1)
+glmFit1 <- train(class ~ ., data = data, 
+                 method = "glm",
+                 family="binomial", #need extra information for glm family
+                 trControl = fitControl) #same fitControl as KNN
+glmFit1
+
+cv.err.glm <- 1-glmFit1$results$Accuracy
+```
+
+```{r caret for rpart}
+
+set.seed(1)
+rpartFit1 <- train(class ~ ., data = data, 
+                 method = "rpart",
+                 trControl = fitControl) #same fitControl as KNN
+rpartFit1
+
+cv.err.rpart <- 1-rpartFit1$results$Accuracy[1]
+```

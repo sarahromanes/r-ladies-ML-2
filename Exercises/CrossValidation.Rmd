@@ -1,28 +1,26 @@
 ---
 title: "Cross Validation - Exercises"
-author: "Sarah Romanes"
+author: "A very cool R Lady"
 date: "13 October 2018"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
 
-# Set Up
+# Setting up (Packages/Data/Etc)
 
-```{r Loading Packages}
-library(cvTools) 
-library(caret)
-
-
-# ML methods
+```{r Packages}
 library(class)
-library(rpart)
 library(randomForest)
+library(cvTools)
+library(ggplot2)
+library(caret)
 ```
 
 
 ```{r Setting up the Data}
 data <- read.csv("data/diabetes.csv")
+data$class <- as.factor(data$class) #remember, classification method require our response variable to be a factor!
 ```
 
 ```{r Explore the data}
@@ -30,82 +28,100 @@ head(data)
 str(data)
 
 
+# Seperate Responses
 X <- data[,-9]
-y <- as.factor(data$class)
+y <- data$class
 ```
 
 ```{r Setting up CV parameters}
 n <- nrow(X)
-V=5
+K <- 5 # Choose 5 fold CV
 ```
 
 
-# CV Loop - KNN
+# Exercise 1) CV loop for different values of k for KNN
 
 ```{r}
-cvSets <- cvFolds(n,V)
-
-error.fold <- c()
-
-for(j in 1:V){
-  inds <- which(cvSets$which==j)
-      
-  test.inds <- cvSets$subsets[inds]
-  
-  X.test <- X[test.inds,]
-  X.train <- X[-test.inds,]
-  y.test <- y[test.inds]
-  y.train <- y[-test.inds]
-  
-  fit <- knn(X.train, X.test, y.train, k=4)
-  
-  error.fold[j]=sum(fit!=y.test)
-}
-
-cv.error <- sum(test.error.knn)/n
-cv.error
-
+k.vals <- 1:50
+# Insert code here
 ```
 
+
+We can plot the error as a function of *k*.
+
+```{r plotting}
+# Create a data frame with k.vals and CV errors - then plot (using either base/ggplot)
+```
+
+# Exercise 2) CV loop for randomForest
+
 ```{r}
-V <- 200
-n <- nrow(data)
+
+# Create a CV loop similar to the one shown in the slides for KNN, but for randomForest instead. Revise last weeks slides for a reminder on randomForest syntax.
+```
+
+We can see that randomForest is outperforming KNN.
+
+# Exercise 3) Repeated CV loop for KNN (10 times) using the best K value
+
+```{r repeated KNN CV loop}
+
 reps <- 10
 
-X <- data[,1:8]
-y <- data$class
+# Insert R code here
+```
 
-cv.error <- c()
-for(i in 1:reps){
-  
-  set.seed(i)
-  
-  cvSets <- cvFolds(n,V)
-  
-  error.fold <- c()
-  for(j in 1:V){
-    
-    inds <- which(cvSets$which==j)
-        
-    test.inds <- cvSets$subsets[inds]
-    
-    X.test <- X[test.inds,]
-    X.train <- X[-test.inds,]
-    y.test <- y[test.inds]
-    y.train <- y[-test.inds]
-    
-    fit <- knn(X.train, X.test, y.train, k=9)
-    
-    error.fold[j] <- sum(fit!=y.test)
-  }
-  
-  cv.error[i] <- sum(error.fold)/n
-  
-}
 
-cv.100<- cv.error
 
-boxplot(cv.5, cv.20, cv.100)
+# Exercise 4) Repeated CV loop for randomForest
+
+```{r repeated randomForest CV loop}
+
+reps <- 10
+
+# Insert R code here
 
 ```
 
+Compare results between RF and KNN using a comparative boxplot
+
+```{r quick compare}
+# Hint, can do this very quickly using baseR!
+```
+
+
+
+
+# Exercise 5) Using the `caret` package and comparing results
+
+```{r caret for KNN}
+fitControl <- trainControl(## 5-fold CV
+                           method = "repeatedcv",
+                           number =5,
+                           ## repeated ten times
+                           repeats = 10)
+
+set.seed(1)
+knnFit1 <- train(class ~ ., data = data, 
+                 method = "knn", 
+                 trControl = fitControl)
+knnFit1
+
+cv.err.knn <- 1-knnFit1$results$Accuracy[3] #CV error is 1-Accuracy. We pick the 3rd accuracy as the 9 was picked as best parameter.
+```
+
+```{r caret for RF}
+
+# Repeat above for RF.
+
+```
+
+```{r caret for GLM}
+
+# Repeat above for GLM. Be careful, you will need an extra argument besides method!
+```
+
+```{r caret for rpart}
+
+# Repeat above for rpart.
+```
