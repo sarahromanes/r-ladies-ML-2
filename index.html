@@ -730,12 +730,12 @@ class: split-two white
 
 ##  Often, we want to see how well our model can predict new data points. However, it is often impossible to get completely new data.
 
-## So, we split our data into *training* and *testing* sets to evaluate performance, treating the *testing* data as new data points.
+## So, we split our data into .orange[*training]* and .orange[*testing*] sets to evaluate performance, treating the *testing* data as new data points.
 
 
 ]]
 .column[.content.vmiddle.center[
-&lt;img src="images/CV.png", width="80%"&gt;
+&lt;img src="images/Cv1.png", width="80%"&gt;
 ]]
 
 
@@ -751,7 +751,10 @@ class: split-two white
 
 &lt;br&gt;
 
-## To do this, we split our data into .orange[K-Folds]
+## To do this, we split our data into .orange[K-Folds].
+
+&lt;br&gt;
+
 
 ## The first fold is treated as a testing set, and the method is fit on the remaining K − 1 folds. 
 
@@ -759,7 +762,7 @@ class: split-two white
 
 ]]
 .column[.content.vmiddle.center[
-&lt;img src="images/CV.png", width="80%"&gt;
+&lt;img src="images/Cv1.png", width="80%"&gt;
 ]]
 
 ---
@@ -774,13 +777,17 @@ class: split-two white
 
 &lt;br&gt;
 
+&lt;br&gt;
 
-## The misclassification error rate is then computed on the observations in the held-out fold. This procedure is repeated K times; each time, a different group of observations is treated as a testing set.
+
+## The misclassification error rate is then computed on the observations in the held-out fold. 
+
+## This procedure is .orange[repeated K] times; each time, a different group of observations is treated as a testing set.
 
 
 ]]
 .column[.content.vmiddle.center[
-&lt;img src="images/CV.png", width="80%"&gt;
+&lt;img src="images/Cv2.png", width="80%"&gt;
 ]]
 
 
@@ -793,6 +800,8 @@ class: split-two white
 &lt;br&gt;
 
 # Cross Validation
+
+&lt;br&gt;
 
 &lt;br&gt;
 
@@ -802,7 +811,7 @@ class: split-two white
 
 ]]
 .column[.content.vmiddle.center[
-&lt;img src="images/CV.png", width="80%"&gt;
+&lt;img src="images/Cv3.png", width="80%"&gt;
 ]]
 
 
