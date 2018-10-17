@@ -49,7 +49,7 @@ rer.rpart <- mean(fitted.vals!=y)
 rer.rpart
 
 # Confusion matrix
-confusion.rpart <- confusionMatrix(y, fitted.vals) 
+confusion.rpart <- confusionMatrix(fitted.vals, y) 
 confusion.rpart$table
 
 confusion.rpart$overall["Accuracy"] # Note that Accuracy is just 1-rer.rpart
@@ -71,7 +71,7 @@ rer.rf <- mean(fitted.vals!=y)
 rer.rf
 
 # Confusion matrix
-confusion.rf <- confusionMatrix(y, fitted.vals) 
+confusion.rf <- confusionMatrix(fitted.vals, y) 
 confusion.rf$table
 
 confusion.rf$overall["Accuracy"] # Note that Accuracy is just 1-rer.rf
@@ -91,7 +91,7 @@ rer.knn <- mean(fitted.vals!=y)
 rer.knn
 
 # Confusion matrix
-confusion.knn <- confusionMatrix(y, fitted.vals) 
+confusion.knn <- confusionMatrix(fitted.vals, y) 
 confusion.knn$table
 
 confusion.knn$overall["Accuracy"] # Note that Accuracy is just 1-rer.knn
@@ -115,7 +115,7 @@ rer.glm <- mean(fitted.vals!=y)
 rer.glm
 
 # Confusion matrix
-confusion.glm <- confusionMatrix(y, fitted.vals) 
+confusion.glm <- confusionMatrix(fitted.vals, y) 
 confusion.glm$table
 
 confusion.glm$overall["Accuracy"] # Note that Accuracy is just 1-rer.glm
